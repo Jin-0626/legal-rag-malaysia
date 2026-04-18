@@ -1,0 +1,59 @@
+{
+  "total_queries": 2,
+  "hit_at_1": 1.0,
+  "hit_at_3": 1.0,
+  "error_breakdown": {
+    "wrong_act": 0,
+    "wrong_section": 0,
+    "right_section_wrong_subsection": 0,
+    "no_hit_in_top_k": 0
+  },
+  "cases": [
+    {
+      "query": "consent requirement",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "6",
+      "expected_subsection_id": "1",
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "miss_category": null,
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "pdpa_2010:6:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "6",
+          "subsection_id": "1",
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        }
+      ]
+    },
+    {
+      "query": "notice purpose",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "7",
+      "expected_subsection_id": null,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "miss_category": null,
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "pdpa_2010:7:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "7",
+          "subsection_id": "1",
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        }
+      ]
+    }
+  ]
+}

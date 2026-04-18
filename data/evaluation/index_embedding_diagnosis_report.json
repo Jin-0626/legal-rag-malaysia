@@ -1,0 +1,71 @@
+{
+  "embedding_generation_path": {
+    "embedder_module": "src/legal_rag/embeddings/embedder.py",
+    "indexing_script": "scripts/index_law_chunks.py",
+    "vector_store_writer": "src/legal_rag/retrieval/vector_store.py",
+    "indexing_script_uses_default_embedder": true,
+    "indexing_script_has_no_fallback_transport": true
+  },
+  "persisted_vector_file": {
+    "path": "data/embeddings/personal-data-protection-act-2010.smoke.vectors.jsonl",
+    "record_count": 20,
+    "unique_embedding_count": 3,
+    "embedding_dimensions": [
+      3
+    ],
+    "first_five_embeddings": [
+      [
+        0.0,
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "first_five_chunk_texts_are_distinct": true,
+    "likely_real_ollama_output": false
+  },
+  "processed_source_comparison": {
+    "processed_chunk_file": "data/processed/personal-data-protection-act-2010.smoke.jsonl",
+    "processed_chunk_count": 216,
+    "vector_record_count": 20,
+    "produced_by_full_index_script_run": false
+  },
+  "writer_and_loader_checks": {
+    "writer_roundtrip_preserves_unique_embeddings": true,
+    "raw_loaded_embedding_match": true,
+    "persistence_changed_embeddings": false
+  },
+  "diagnosis": {
+    "different_chunk_texts_produced_identical_embeddings_before_persistence": true,
+    "main_cause": "the persisted smoke vector file was created from non-real low-dimensional fallback/test embeddings rather than live Ollama embeddings",
+    "embedder_output_bug_in_current_code": false,
+    "indexing_script_bug": false,
+    "vector_store_writer_bug": false,
+    "fallback_behavior_contaminated_indexed_vectors": true,
+    "supporting_signals": [
+      "stored embeddings are 3-dimensional and one-hot-like, which is not plausible for nomic-embed-text",
+      "the current indexing script uses OllamaEmbedder directly and contains no fallback path",
+      "the persisted smoke vector file contains only 20 records while the processed PDPA chunk file contains 216 records",
+      "writer roundtrip and load checks preserve embeddings exactly, so duplication was already present before persistence"
+    ]
+  }
+}

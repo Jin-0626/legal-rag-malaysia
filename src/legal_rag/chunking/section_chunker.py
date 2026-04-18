@@ -1,0 +1,384 @@
+"""Section-aware chunking for Malaysian legal text."""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+from pathlib import Path
+
+from .models import Chunk
+
+SECTION_PATTERN = re.compile(r"^Section\s+(?P<section_id>\d+[A-Z]?)\b(?P<heading>.*)$")
+NUMBERED_SECTION_PATTERN = re.compile(r"^(?P<section_id>\d+[A-Z]?)\.\s*(?P<body>.*)$")
+SUBSECTION_PATTERN = re.compile(r"^\((?P<subsection_id>\d+[A-Z]?)\)\s*(?P<body>.*)$")
+PARAGRAPH_PATTERN = re.compile(r"^\((?P<paragraph_id>[a-zA-Z]+)\)\s*(?P<body>.*)$")
+PART_PATTERN = re.compile(r"^(Part|PART)\s+[A-Z0-9IVXLC]+$")
+DIVISION_PATTERN = re.compile(r"^Division\s+\d+[A-Z]?$")
+
+
+@dataclass(frozen=True)
+class _LegalUnit:
+    section_heading: str
+    section_id: str
+    subsection_id: str | None
+    paragraph_id: str | None
+    text: str
+
+
+def chunk_legal_text(
+    document_id: str,
+    text: str,
+    source_path: str,
+    act_title: str = "",
+    act_number: str = "",
+    max_words: int = 250,
+    overlap_words: int = 40,
+) -> list[Chunk]:
+    """Chunk legal text by section, subsection, and paragraph boundaries."""
+
+    units = _extract_legal_units(text)
+    if not units:
+        return []
+
+    chunks: list[Chunk] = []
+    current_units: list[_LegalUnit] = []
+    current_word_count = 0
+    chunk_index = 0
+
+    for unit in units:
+        unit_word_count = len(unit.text.split())
+        if unit_word_count > max_words and not (unit.subsection_id or unit.paragraph_id):
+            if current_units:
+                chunks.append(
+                    _build_chunk(
+                        document_id=document_id,
+                        units=current_units,
+                        source_path=source_path,
+                        chunk_index=chunk_index,
+                        act_title=act_title,
+                        act_number=act_number,
+                    )
+                )
+                chunk_index += 1
+                current_units = _overlap_units(current_units, overlap_words)
+                current_word_count = _word_count(current_units)
+
+            oversized_chunks = _split_large_unit(
+                document_id=document_id,
+                unit=unit,
+                source_path=source_path,
+                act_title=act_title,
+                act_number=act_number,
+                max_words=max_words,
+                overlap_words=overlap_words,
+                chunk_index_start=chunk_index,
+            )
+            chunks.extend(oversized_chunks)
+            chunk_index += len(oversized_chunks)
+            current_units = []
+            current_word_count = 0
+            continue
+
+        prospective_count = current_word_count + unit_word_count
+        if current_units and prospective_count > max_words:
+            chunks.append(
+                _build_chunk(
+                    document_id=document_id,
+                    units=current_units,
+                    source_path=source_path,
+                    chunk_index=chunk_index,
+                    act_title=act_title,
+                    act_number=act_number,
+                )
+            )
+            chunk_index += 1
+            current_units = _overlap_units(current_units, overlap_words)
+            current_word_count = _word_count(current_units)
+
+        current_units.append(unit)
+        current_word_count += unit_word_count
+
+    if current_units:
+        chunks.append(
+            _build_chunk(
+                document_id=document_id,
+                units=current_units,
+                source_path=source_path,
+                chunk_index=chunk_index,
+                act_title=act_title,
+                act_number=act_number,
+            )
+        )
+
+    return chunks
+
+
+def chunk_section_text(
+    document_id: str,
+    section_heading: str,
+    text: str,
+    source_path: str,
+    act_title: str = "",
+    act_number: str = "",
+    max_words: int = 250,
+    overlap_words: int = 40,
+) -> list[Chunk]:
+    """Chunk one section while preserving subsection and paragraph integrity."""
+
+    normalized_heading = section_heading.strip()
+    if not normalized_heading or not text.strip():
+        return []
+
+    section_text = f"{normalized_heading}\n{text.strip()}"
+    return chunk_legal_text(
+        document_id=document_id,
+        text=section_text,
+        source_path=source_path,
+        act_title=act_title,
+        act_number=act_number,
+        max_words=max_words,
+        overlap_words=overlap_words,
+    )
+
+
+def _extract_legal_units(text: str) -> list[_LegalUnit]:
+    current_section_id: str | None = None
+    current_section_heading = ""
+    current_subsection_id: str | None = None
+    current_paragraph_id: str | None = None
+    current_lines: list[str] = []
+    units: list[_LegalUnit] = []
+    pending_section_heading: str | None = None
+
+    def flush_current_unit() -> None:
+        nonlocal current_lines
+        if not current_section_id or not current_lines:
+            current_lines = []
+            return
+
+        normalized_text = "\n".join(line.strip() for line in current_lines if line.strip())
+        if not normalized_text:
+            current_lines = []
+            return
+
+        units.append(
+            _LegalUnit(
+                section_heading=current_section_heading,
+                section_id=current_section_id,
+                subsection_id=current_subsection_id,
+                paragraph_id=current_paragraph_id,
+                text=normalized_text,
+            )
+        )
+        current_lines = []
+
+    lines = [raw_line.strip() for raw_line in text.splitlines() if raw_line.strip()]
+
+    for index, line in enumerate(lines):
+        next_line = lines[index + 1] if index + 1 < len(lines) else None
+
+        section_match = SECTION_PATTERN.match(line)
+        if section_match:
+            flush_current_unit()
+            current_section_id = section_match.group("section_id")
+            heading_suffix = section_match.group("heading").strip()
+            current_section_heading = f"Section {current_section_id}"
+            if heading_suffix:
+                current_section_heading = f"{current_section_heading} {heading_suffix}"
+            current_subsection_id = None
+            current_paragraph_id = None
+            current_lines = [line]
+            pending_section_heading = None
+            continue
+
+        numbered_section_match = NUMBERED_SECTION_PATTERN.match(line)
+        if numbered_section_match and _looks_like_section_start(
+            line=line,
+            pending_section_heading=pending_section_heading,
+            current_section_id=current_section_id,
+        ):
+            flush_current_unit()
+            current_section_id = numbered_section_match.group("section_id")
+            current_section_heading = _build_numbered_section_heading(
+                section_id=current_section_id,
+                pending_heading=pending_section_heading,
+            )
+            current_subsection_id = _extract_subsection_id(
+                numbered_section_match.group("body")
+            )
+            current_paragraph_id = None
+            current_lines = [current_section_heading, line]
+            pending_section_heading = None
+            continue
+
+        subsection_match = SUBSECTION_PATTERN.match(line)
+        if subsection_match and current_section_id:
+            if current_lines == [current_section_heading]:
+                current_subsection_id = subsection_match.group("subsection_id")
+                current_paragraph_id = None
+                current_lines.append(line)
+                continue
+
+            flush_current_unit()
+            current_subsection_id = subsection_match.group("subsection_id")
+            current_paragraph_id = None
+            current_lines = [line]
+            pending_section_heading = None
+            continue
+
+        paragraph_match = PARAGRAPH_PATTERN.match(line)
+        if paragraph_match and current_section_id:
+            if current_subsection_id:
+                current_lines.append(line)
+            else:
+                flush_current_unit()
+                current_paragraph_id = paragraph_match.group("paragraph_id")
+                current_lines = [line]
+            pending_section_heading = None
+            continue
+
+        if _can_be_section_heading(line, next_line):
+            pending_section_heading = line
+            continue
+
+        pending_section_heading = None
+        current_lines.append(line)
+
+    flush_current_unit()
+    return units
+
+
+def _build_chunk(
+    document_id: str,
+    units: list[_LegalUnit],
+    source_path: str,
+    chunk_index: int,
+    act_title: str,
+    act_number: str,
+) -> Chunk:
+    first_unit = units[0]
+    subsection_id = first_unit.subsection_id if all(
+        unit.subsection_id == first_unit.subsection_id for unit in units
+    ) else None
+    paragraph_id = first_unit.paragraph_id if all(
+        unit.paragraph_id == first_unit.paragraph_id for unit in units
+    ) else None
+
+    return Chunk(
+        chunk_id=f"{document_id}:{first_unit.section_id}:{chunk_index}",
+        document_id=document_id,
+        section_heading=first_unit.section_heading,
+        section_id=first_unit.section_id,
+        subsection_id=subsection_id,
+        paragraph_id=paragraph_id,
+        text="\n".join(unit.text for unit in units),
+        source_path=source_path,
+        act_title=act_title,
+        act_number=act_number,
+        source_file=Path(source_path).name,
+        chunk_index=chunk_index,
+    )
+
+
+def _split_large_unit(
+    document_id: str,
+    unit: _LegalUnit,
+    source_path: str,
+    act_title: str,
+    act_number: str,
+    max_words: int,
+    overlap_words: int,
+    chunk_index_start: int,
+) -> list[Chunk]:
+    words = unit.text.split()
+    step = max(1, max_words - overlap_words)
+    chunks: list[Chunk] = []
+
+    for offset, start in enumerate(range(0, len(words), step)):
+        chunk_words = words[start : start + max_words]
+        if not chunk_words:
+            continue
+        chunk_text = " ".join(chunk_words)
+        chunks.append(
+            Chunk(
+                chunk_id=f"{document_id}:{unit.section_id}:{chunk_index_start + offset}",
+                document_id=document_id,
+                section_heading=unit.section_heading,
+                section_id=unit.section_id,
+                subsection_id=unit.subsection_id,
+                paragraph_id=unit.paragraph_id,
+                text=chunk_text,
+                source_path=source_path,
+                act_title=act_title,
+                act_number=act_number,
+                source_file=Path(source_path).name,
+                chunk_index=chunk_index_start + offset,
+            )
+        )
+
+    return chunks
+
+
+def _overlap_units(units: list[_LegalUnit], overlap_words: int) -> list[_LegalUnit]:
+    if overlap_words <= 0:
+        return []
+
+    overlapped: list[_LegalUnit] = []
+    running_words = 0
+    for unit in reversed(units):
+        unit_words = len(unit.text.split())
+        if overlapped and running_words + unit_words > overlap_words:
+            break
+        overlapped.insert(0, unit)
+        running_words += unit_words
+        if running_words >= overlap_words:
+            break
+
+    return overlapped
+
+
+def _word_count(units: list[_LegalUnit]) -> int:
+    return sum(len(unit.text.split()) for unit in units)
+
+
+def _can_be_section_heading(line: str, next_line: str | None) -> bool:
+    if not next_line or not NUMBERED_SECTION_PATTERN.match(next_line):
+        return False
+
+    if SECTION_PATTERN.match(line) or PART_PATTERN.match(line) or DIVISION_PATTERN.match(line):
+        return False
+
+    if re.fullmatch(r"\d+", line):
+        return False
+
+    if line.endswith((".", ";", ":", ",")):
+        return False
+
+    return True
+
+
+def _looks_like_section_start(
+    line: str,
+    pending_section_heading: str | None,
+    current_section_id: str | None,
+) -> bool:
+    if pending_section_heading:
+        return True
+
+    if current_section_id is None:
+        return True
+
+    return not line.startswith(f"{current_section_id}.")
+
+
+def _build_numbered_section_heading(section_id: str, pending_heading: str | None) -> str:
+    if pending_heading:
+        return f"Section {section_id} {pending_heading}"
+    return f"Section {section_id}"
+
+
+def _extract_subsection_id(section_body: str) -> str | None:
+    subsection_match = SUBSECTION_PATTERN.match(section_body.strip())
+    if subsection_match:
+        return subsection_match.group("subsection_id")
+    return None

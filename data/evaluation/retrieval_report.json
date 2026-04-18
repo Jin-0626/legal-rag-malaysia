@@ -1,0 +1,718 @@
+{
+  "total_queries": 15,
+  "hit_at_1": 0.13333333333333333,
+  "hit_at_3": 0.3333333333333333,
+  "error_breakdown": {
+    "wrong_act": 0,
+    "wrong_section": 10,
+    "right_section_wrong_subsection": 0,
+    "no_hit_in_top_k": 0
+  },
+  "cases": [
+    {
+      "query": "What is the short title of the PDPA?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "1",
+      "expected_subsection_id": null,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "miss_category": null,
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "When does the Personal Data Protection Act 2010 come into operation?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "1",
+      "expected_subsection_id": null,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "miss_category": null,
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "Who does the PDPA apply to in commercial transactions?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "2",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": true,
+      "miss_category": null,
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        }
+      ]
+    },
+    {
+      "query": "Does the PDPA apply to a person established in Malaysia?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "2",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": true,
+      "miss_category": null,
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        }
+      ]
+    },
+    {
+      "query": "Does the PDPA apply to a person who uses equipment in Malaysia?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "2",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": true,
+      "miss_category": null,
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": true,
+          "subsection_match": true,
+          "target_match": true
+        }
+      ]
+    },
+    {
+      "query": "Are the Federal Government and State Governments subject to the PDPA?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "3",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "Does the PDPA apply to personal data processed outside Malaysia?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "3",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "What is personal data under the PDPA?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "4",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "What is sensitive personal data under the PDPA?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "4",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "What does processing mean under the PDPA?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "4",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "What are the personal data protection principles in the PDPA?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "5",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "When may personal data be processed under the General Principle?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "6",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "What does the General Principle say about processing personal data?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "6",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "What information must be given under the Notice and Choice Principle?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "7",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    },
+    {
+      "query": "What does the Notice and Choice Principle require a data user to tell a data subject?",
+      "expected_act_title": "Personal Data Protection Act 2010",
+      "expected_section_id": "7",
+      "expected_subsection_id": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "miss_category": "wrong_section",
+      "matches": [
+        {
+          "rank": 1,
+          "chunk_id": "personal-data-protection-act-2010:1:0",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "1",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "personal-data-protection-act-2010:2:1",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "personal-data-protection-act-2010:2:2",
+          "act_title": "Personal Data Protection Act 2010",
+          "section_id": "2",
+          "subsection_id": null,
+          "score": 1.0,
+          "act_match": true,
+          "section_match": false,
+          "subsection_match": true,
+          "target_match": false
+        }
+      ]
+    }
+  ]
+}

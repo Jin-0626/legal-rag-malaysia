@@ -1,0 +1,15 @@
+{"query":"What is the short title of the PDPA?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"1"}
+{"query":"When does the Personal Data Protection Act 2010 come into operation?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"1"}
+{"query":"Who does the PDPA apply to in commercial transactions?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"2"}
+{"query":"Does the PDPA apply to a person established in Malaysia?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"2"}
+{"query":"Does the PDPA apply to a person who uses equipment in Malaysia?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"2"}
+{"query":"Are the Federal Government and State Governments subject to the PDPA?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"3"}
+{"query":"Does the PDPA apply to personal data processed outside Malaysia?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"3"}
+{"query":"What is personal data under the PDPA?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"4"}
+{"query":"What is sensitive personal data under the PDPA?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"4"}
+{"query":"What does processing mean under the PDPA?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"4"}
+{"query":"What are the personal data protection principles in the PDPA?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"5"}
+{"query":"When may personal data be processed under the General Principle?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"6"}
+{"query":"What does the General Principle say about processing personal data?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"6"}
+{"query":"What information must be given under the Notice and Choice Principle?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"7"}
+{"query":"What does the Notice and Choice Principle require a data user to tell a data subject?","expected_act_title":"Personal Data Protection Act 2010","expected_section_id":"7"}
