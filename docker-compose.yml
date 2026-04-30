@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gpt-oss:120b-cloud}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
+      OLLAMA_TIMEOUT_SECONDS: ${OLLAMA_TIMEOUT_SECONDS:-120}
+      LEGAL_RAG_REQUIRE_API_KEY: ${LEGAL_RAG_REQUIRE_API_KEY:-true}
+      LEGAL_RAG_API_KEYS_FILE: ${LEGAL_RAG_API_KEYS_FILE:-/app/config/api_keys.example.json}
+      LEGAL_RAG_DATABASE_ENABLED: ${LEGAL_RAG_DATABASE_ENABLED:-true}
+      DATABASE_URL: ${DATABASE_URL}
+      APP_ENV: ${APP_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LEGAL_RAG_VECTOR_STORE: ${LEGAL_RAG_VECTOR_STORE:-data/embeddings/legal-corpus.vectors.jsonl}
+      LEGAL_RAG_API_HOST: 0.0.0.0
+      LEGAL_RAG_API_PORT: 8000
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-legal_rag}
+      POSTGRES_USER: ${POSTGRES_USER:-legal_rag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+
+volumes:
+  pgdata:

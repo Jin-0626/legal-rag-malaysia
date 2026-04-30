@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+  pull_request:
+
+jobs:
+  backend-and-frontend:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      LEGAL_RAG_REQUIRE_API_KEY: "false"
+      LEGAL_RAG_DATABASE_ENABLED: "false"
+      OLLAMA_BASE_URL: http://127.0.0.1:11434
+      OLLAMA_MODEL: gpt-oss:120b-cloud
+      OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+      VITE_API_BASE_URL: http://127.0.0.1:8000
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run API tests
+        run: python -m pytest tests/test_api.py --basetemp .pytest-tmp-ci-api
+
+      - name: Run retrieval tests
+        run: python -m pytest tests/test_retrieval.py --basetemp .pytest-tmp-ci-retrieval
+
+      - name: Run graph retrieval tests
+        run: python -m pytest tests/test_graph_retrieval.py --basetemp .pytest-tmp-ci-graph
+
+      - name: Run RAGFlow wrapper tests
+        run: python -m pytest tests/test_ragflow_tool.py --basetemp .pytest-tmp-ci-ragflow
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build

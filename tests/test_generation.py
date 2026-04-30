@@ -47,10 +47,12 @@ def test_grounded_answer_generator_supported_query() -> None:
     answer = generator.answer("What does Section 6 require?", retrieved)
 
     assert answer.grounded is True
-    assert answer.citations == ["pdpa_2010 Section 6(1)"]
-    assert "Evidence assessment: Supported evidence" in answer.answer
-    assert "Known from retrieved context:" in answer.answer
-    assert "Unknown from retrieved context:" in answer.answer
+    assert answer.citations == ["pdpa_2010, Section 6(1)"]
+    assert "Direct Answer:" in answer.answer
+    assert "Legal Basis:" in answer.answer
+    assert "Practical Meaning:" in answer.answer
+    assert "Important Limits:" in answer.answer
+    assert "Sources:" in answer.answer
     assert "not legal advice" in answer.answer
 
 
@@ -61,9 +63,11 @@ def test_grounded_answer_generator_unsupported_query() -> None:
 
     assert answer.grounded is False
     assert answer.citations == []
-    assert "Evidence assessment: No evidence" in answer.answer
-    assert "No retrieved chunk supports an answer" in answer.answer
-    assert "cannot provide legal advice" in answer.answer
+    assert "Direct Answer:" in answer.answer
+    assert "Legal Basis:" in answer.answer
+    assert "No retrieved legal provision supports an answer to this question." in answer.answer
+    assert "Important Limits:" in answer.answer
+    assert "This response is limited by the absence of supporting retrieved evidence." in answer.answer
 
 
 def test_grounded_answer_generator_ambiguous_query() -> None:
@@ -90,11 +94,11 @@ def test_grounded_answer_generator_ambiguous_query() -> None:
     answer = generator.answer("What must happen before processing personal data?", retrieved)
 
     assert answer.grounded is False
-    assert answer.citations == ["pdpa_2010 Section 6", "pdpa_2010 Section 7"]
-    assert "Evidence assessment: Ambiguous evidence" in answer.answer
-    assert "different provisions with similar support" in answer.answer
-    assert "Known from retrieved context:" in answer.answer
-    assert "Unknown from retrieved context:" in answer.answer
+    assert answer.citations == ["pdpa_2010, Section 6", "pdpa_2010, Section 7"]
+    assert "Direct Answer:" in answer.answer
+    assert "The retrieved sources point to more than one plausible provision" in answer.answer
+    assert "Legal Basis:" in answer.answer
+    assert "Important Limits:" in answer.answer
 
 
 def test_grounded_answer_generator_supports_multiple_evidence_references() -> None:
@@ -135,10 +139,13 @@ def test_grounded_answer_generator_supports_multiple_evidence_references() -> No
 
     assert answer.grounded is True
     assert answer.citations == [
-        "pdpa_2010 Section 6(1)",
-        "pdpa_2010 Section 7(1)(a)",
-        "pdpa_2010 Section 7(1)(b)",
+        "pdpa_2010, Section 6(1)",
+        "pdpa_2010, Section 7(1)(a)",
+        "pdpa_2010, Section 7(1)(b)",
     ]
-    assert "pdpa_2010 Section 6(1) says" in answer.answer
-    assert "pdpa_2010 Section 7(1)(a) says" in answer.answer
-    assert "pdpa_2010 Section 7(1)(b) says" in answer.answer
+    assert "Direct Answer:" in answer.answer
+    assert "Legal Basis:" in answer.answer
+    assert "The closest retrieved provision is pdpa_2010, Section 6(1)." in answer.answer
+    assert "Additional supporting sources:" not in answer.answer
+    assert "pdpa_2010, Section 7(1)(a)" in answer.answer
+    assert "pdpa_2010, Section 7(1)(b)" in answer.answer

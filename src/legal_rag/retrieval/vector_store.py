@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import json
-import math
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 from legal_rag.chunking.models import Chunk
-from legal_rag.embeddings.embedder import OllamaEmbedder
-from legal_rag.retrieval.in_memory import RetrievalResult
+from legal_rag.embeddings.embedder import EmbeddedChunk, OllamaEmbedder
+from legal_rag.retrieval.in_memory import RetrievalResult, SearchMode, search_embedded_entries
 
 
 @dataclass(frozen=True)
@@ -23,11 +22,14 @@ class StoredVectorRecord:
     act_number: str
     section_heading: str
     section_id: str
+    unit_type: str
+    unit_id: str
     subsection_id: str | None
     paragraph_id: str | None
     source_file: str
     source_path: str
     chunk_index: int
+    document_aliases: list[str]
     text: str
     embedding: list[float]
 
@@ -55,6 +57,8 @@ def chunk_from_record(record: dict[str, Any]) -> Chunk:
         document_id=record["document_id"],
         section_heading=record["section_heading"],
         section_id=record["section_id"],
+        unit_type=record.get("unit_type", "section"),
+        unit_id=record.get("unit_id", record["section_id"]),
         subsection_id=record.get("subsection_id"),
         paragraph_id=record.get("paragraph_id"),
         text=record["text"],
@@ -63,7 +67,8 @@ def chunk_from_record(record: dict[str, Any]) -> Chunk:
         act_number=record.get("act_number", ""),
         source_file=record.get("source_file", ""),
         chunk_index=int(record.get("chunk_index", 0)),
-    )
+        document_aliases=tuple(record.get("document_aliases", [])),
+        )
 
 
 def chunk_to_stored_record(chunk: Chunk, embedding: list[float]) -> StoredVectorRecord:
@@ -76,11 +81,14 @@ def chunk_to_stored_record(chunk: Chunk, embedding: list[float]) -> StoredVector
         act_number=chunk.act_number,
         section_heading=chunk.section_heading,
         section_id=chunk.section_id,
+        unit_type=chunk.unit_type,
+        unit_id=chunk.unit_id or chunk.section_id,
         subsection_id=chunk.subsection_id,
         paragraph_id=chunk.paragraph_id,
         source_file=chunk.source_file,
         source_path=chunk.source_path,
         chunk_index=chunk.chunk_index,
+        document_aliases=list(chunk.document_aliases),
         text=chunk.text,
         embedding=list(embedding),
     )
@@ -92,14 +100,22 @@ class JsonlVectorStore:
     def __init__(self, path: Path) -> None:
         self.path = Path(path)
 
-    def index_chunks(self, chunks: list[Chunk], embedder: OllamaEmbedder) -> int:
+    def index_chunks(
+        self,
+        chunks: list[Chunk],
+        embedder: OllamaEmbedder,
+        batch_size: int = 64,
+    ) -> int:
         """Embed chunks and write them into the JSONL vector store."""
 
-        embeddings = embedder.embed([chunk.text for chunk in chunks])
-        records = [
-            chunk_to_stored_record(chunk, embedding)
-            for chunk, embedding in zip(chunks, embeddings, strict=True)
-        ]
+        records: list[StoredVectorRecord] = []
+        for start in range(0, len(chunks), batch_size):
+            batch = chunks[start : start + batch_size]
+            embeddings = embedder.embed([chunk.text for chunk in batch])
+            records.extend(
+                chunk_to_stored_record(chunk, embedding)
+                for chunk, embedding in zip(batch, embeddings, strict=True)
+            )
         self.write_records(records)
         return len(records)
 
@@ -128,11 +144,14 @@ class JsonlVectorStore:
                         act_number=payload.get("act_number", ""),
                         section_heading=payload["section_heading"],
                         section_id=payload["section_id"],
+                        unit_type=payload.get("unit_type", "section"),
+                        unit_id=payload.get("unit_id", payload["section_id"]),
                         subsection_id=payload.get("subsection_id"),
                         paragraph_id=payload.get("paragraph_id"),
                         source_file=payload.get("source_file", ""),
                         source_path=payload["source_path"],
                         chunk_index=int(payload.get("chunk_index", 0)),
+                        document_aliases=list(payload.get("document_aliases", [])),
                         text=payload["text"],
                         embedding=[float(value) for value in payload["embedding"]],
                     )
@@ -144,6 +163,7 @@ class JsonlVectorStore:
         query: str,
         embedder: OllamaEmbedder,
         top_k: int = 3,
+        mode: SearchMode = "hybrid",
     ) -> list[RetrievalResult]:
         if not query.strip():
             return []
@@ -152,42 +172,29 @@ class JsonlVectorStore:
         if not records:
             return []
 
-        query_embedding = embedder.embed([query])[0]
-        ranked: list[RetrievalResult] = []
-        for record in records:
-            score = _cosine_similarity(query_embedding, record.embedding)
-            if score <= 0.0:
-                continue
-            ranked.append(
-                RetrievalResult(
-                    chunk=chunk_from_record(
-                        {
-                            "chunk_id": record.chunk_id,
-                            "document_id": record.document_id,
-                            "act_title": record.act_title,
-                            "act_number": record.act_number,
-                            "section_heading": record.section_heading,
-                            "section_id": record.section_id,
-                            "subsection_id": record.subsection_id,
-                            "paragraph_id": record.paragraph_id,
-                            "source_file": record.source_file,
-                            "source_path": record.source_path,
-                            "chunk_index": record.chunk_index,
-                            "text": record.text,
-                        }
-                    ),
-                    score=score,
-                )
+        entries = [
+            EmbeddedChunk(
+                chunk=chunk_from_record(
+                    {
+                        "chunk_id": record.chunk_id,
+                        "document_id": record.document_id,
+                        "act_title": record.act_title,
+                        "act_number": record.act_number,
+                        "section_heading": record.section_heading,
+                        "section_id": record.section_id,
+                        "unit_type": record.unit_type,
+                        "unit_id": record.unit_id,
+                        "subsection_id": record.subsection_id,
+                        "paragraph_id": record.paragraph_id,
+                        "source_file": record.source_file,
+                        "source_path": record.source_path,
+                        "chunk_index": record.chunk_index,
+                        "document_aliases": record.document_aliases,
+                        "text": record.text,
+                    }
+                ),
+                embedding=record.embedding,
             )
-
-        return sorted(ranked, key=lambda item: (-item.score, item.chunk.chunk_id))[:top_k]
-
-
-def _cosine_similarity(left: list[float], right: list[float]) -> float:
-    left_norm = math.sqrt(sum(value * value for value in left))
-    right_norm = math.sqrt(sum(value * value for value in right))
-    if left_norm == 0.0 or right_norm == 0.0:
-        return 0.0
-
-    dot_product = sum(left_value * right_value for left_value, right_value in zip(left, right))
-    return dot_product / (left_norm * right_norm)
+            for record in records
+        ]
+        return search_embedded_entries(entries, query, embedder, top_k=top_k, mode=mode)

@@ -22,3 +22,6 @@ class Chunk:
     act_number: str = ""
     source_file: str = ""
     chunk_index: int = 0
+    unit_type: str = "section"
+    unit_id: str = ""
+    document_aliases: tuple[str, ...] = ()

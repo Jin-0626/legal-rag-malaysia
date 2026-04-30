@@ -1,0 +1,40 @@
+{
+  "name": "Malaysia Legal RAG Simple Flow",
+  "description": "Minimal RAGFlow orchestration template: user input -> legal_rag_query tool -> output.",
+  "nodes": [
+    {
+      "id": "user_input",
+      "type": "input",
+      "label": "User Input",
+      "outputs": {
+        "query": "{{input.query}}"
+      }
+    },
+    {
+      "id": "legal_rag_query",
+      "type": "tool",
+      "tool_name": "legal_rag_query",
+      "label": "Legal RAG Query",
+      "inputs": {
+        "query": "{{user_input.query}}",
+        "mode": "auto"
+      }
+    },
+    {
+      "id": "assistant_output",
+      "type": "output",
+      "label": "Answer",
+      "inputs": {
+        "answer": "{{legal_rag_query.answer}}",
+        "sources": "{{legal_rag_query.sources}}",
+        "mode_used": "{{legal_rag_query.mode_used}}",
+        "graph_path": "{{legal_rag_query.graph_path}}"
+      }
+    }
+  ],
+  "edges": [
+    {"from": "user_input", "to": "legal_rag_query"},
+    {"from": "legal_rag_query", "to": "assistant_output"}
+  ]
+}
+

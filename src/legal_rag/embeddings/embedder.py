@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import os
+import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -79,7 +81,7 @@ class OllamaEmbedder:
                 pending_texts.append(text)
 
         if pending_texts:
-            embeddings = self.transport.embed(texts=pending_texts, model=self.model)
+            embeddings = self._embed_with_retry(pending_texts)
             for text, embedding in zip(pending_texts, embeddings, strict=True):
                 self._cache[text] = embedding
 
@@ -92,6 +94,24 @@ class OllamaEmbedder:
             for chunk, embedding in zip(chunks, embeddings, strict=True)
         ]
 
+    def _embed_with_retry(self, texts: list[str]) -> list[list[float]]:
+        try:
+            return self.transport.embed(texts=texts, model=self.model)
+        except Exception:
+            recovered_embeddings: list[list[float]] = []
+            for text in texts:
+                recovered_embeddings.append(self._embed_single_with_retry(text))
+            return recovered_embeddings
+
+    def _embed_single_with_retry(self, text: str) -> list[float]:
+        try:
+            return self.transport.embed(texts=[text], model=self.model)[0]
+        except Exception as original_exc:
+            sanitized = _sanitize_embedding_text(text)
+            if not sanitized or sanitized == text:
+                raise original_exc
+            return self.transport.embed(texts=[sanitized], model=self.model)[0]
+
 
 def _normalize_embedding(vector: Any) -> list[float]:
     if not isinstance(vector, list) or not vector:
@@ -103,3 +123,50 @@ def _normalize_embedding(vector: Any) -> list[float]:
             raise EmbeddingError("Embedding vector contained a non-numeric value.")
         normalized.append(float(value))
     return normalized
+
+
+def _sanitize_embedding_text(text: str) -> str:
+    normalized = unicodedata.normalize("NFKC", text)
+    cleaned_parts: list[str] = []
+    for character in normalized:
+        if character in {"\n", "\r", "\t"}:
+            cleaned_parts.append(" ")
+            continue
+        if ord(character) < 128:
+            cleaned_parts.append(character)
+            continue
+
+        category = unicodedata.category(character)
+        if category.startswith("P") or category.startswith("S"):
+            cleaned_parts.append(
+                {
+                    "“": '"',
+                    "”": '"',
+                    "‘": "'",
+                    "’": "'",
+                    "–": "-",
+                    "—": "-",
+                    "…": "...",
+                }.get(character, " ")
+            )
+            continue
+
+        if category.startswith("L") and "LATIN" in unicodedata.name(character, ""):
+            ascii_equivalent = unicodedata.normalize("NFKD", character).encode("ascii", "ignore").decode("ascii")
+            cleaned_parts.append(ascii_equivalent or " ")
+            continue
+
+        if category.startswith("N"):
+            cleaned_parts.append(character)
+            continue
+
+        cleaned_parts.append(" ")
+
+    sanitized = "".join(cleaned_parts)
+    sanitized = re.sub(r"([.\-_])\1{3,}", " ... ", sanitized)
+    sanitized = re.sub(r"([=*~])\1{3,}", " ", sanitized)
+    sanitized = re.sub(r"\s+", " ", sanitized).strip()
+    if len(sanitized) > 2400:
+        truncated = sanitized[:2400]
+        sanitized = truncated.rsplit(" ", 1)[0] or truncated
+    return sanitized

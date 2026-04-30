@@ -1,0 +1,22 @@
+FROM python:3.13-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app/src
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src ./src
+COPY scripts ./scripts
+COPY config ./config
+COPY data ./data
+COPY docs ./docs
+COPY ragflow_tools ./ragflow_tools
+COPY .env.example ./.env.example
+
+EXPOSE 8000
+
+CMD ["python", "scripts/run_api.py"]

@@ -1,0 +1,22 @@
+{
+  "name": "legal_rag_query",
+  "entrypoint": "ragflow_tools/legal_rag_tool.py:run",
+  "description": "Call the existing Malaysian Legal RAG /chat endpoint and return the answer, sources, mode, graph path, and warnings.",
+  "inputs": [
+    {
+      "name": "query",
+      "type": "string",
+      "required": true,
+      "description": "Legal question to send to the Legal RAG API."
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "required": false,
+      "default": "auto",
+      "enum": ["auto", "hybrid", "graph"],
+      "description": "Retrieval mode passed through to the backend."
+    }
+  ]
+}
+

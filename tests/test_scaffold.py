@@ -65,7 +65,7 @@ def test_chunk_retrieve_and_generate_grounded_answer() -> None:
     assert all(chunk.section_heading == "Section 6" for chunk in chunks)
     assert results
     assert answer.grounded is True
-    assert answer.citations == ["pdpa_2010 Section 6"]
+    assert answer.citations == ["pdpa_2010, Section 6"]
 
 
 def test_ollama_embedder_is_stable_for_same_input() -> None:

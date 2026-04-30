@@ -1,0 +1,113 @@
+{
+  "processed_docs_used": 23,
+  "processed_files_used": [
+    "20231101-income-tax-act-1967-act-53.jsonl",
+    "5. Children and Young Persons (Employment) Act 1966_0.jsonl",
+    "Act 599.jsonl",
+    "Act 828. National Land Code. Revised 2020.jsonl",
+    "Act-139-FACTORIES-AND-MACHINERY-ACT-1967-REVISED-1974.jsonl",
+    "Act-333-English.jsonl",
+    "Act-A1727.jsonl",
+    "Akta Kerja 1955 (Akta 265).jsonl",
+    "Akta_574_(31.5.2023)_BI.jsonl",
+    "Civil-Law-Act-1956.jsonl",
+    "Contracts-Act-1950.jsonl",
+    "EMPLOYMENT_INSURANCE_SYSTEM_ACT_2017_Act_800.jsonl",
+    "F1515447514_MYS43880 2017.jsonl",
+    "Federal Constitution (Reprint 2020).jsonl",
+    "holidays_act_1951.jsonl",
+    "industrial-relations-act-1967.jsonl",
+    "Mariage&Divorce.jsonl",
+    "Occupational-Safety-and-Health-Act-1994-Act-514_Reprint-Version-1.6.2024_English.jsonl",
+    "Perlembagaan Persekutuan (Cetakan Semula 2020).jsonl",
+    "personal-data-protection-act-2010.jsonl",
+    "POLICE ACT 1967.jsonl",
+    "PUA 376.jsonl",
+    "SALE_OF_GOODS_ACT_1957___ACT_382.jsonl"
+  ],
+  "total_chunks_indexed": 12562,
+  "counts_by_document": {
+    "Children and Young Persons (Employment) Act 1966": 60,
+    "Civil Law Act 1956": 63,
+    "Consumer Protection Act 1999": 239,
+    "Contracts Act 1950": 235,
+    "Employees Provident Fund Act 1991": 4681,
+    "Employment Act 1955": 233,
+    "Employment Insurance System Act 2017": 149,
+    "Factories and Machinery Act 1967": 140,
+    "Federal Constitution": 1188,
+    "Holidays Act 1951": 20,
+    "Income Tax Act 1967": 1620,
+    "Industrial Relations Act 1967": 234,
+    "Law Reform (Marriage and Divorce) Act 1976": 135,
+    "Minimum Wages Order 2024": 12,
+    "National Land Code": 1377,
+    "Occupational Safety and Health Act 1994": 167,
+    "Penal Code": 1209,
+    "Personal Data Protection (Amendment) Act 2024": 15,
+    "Personal Data Protection Act 2010": 196,
+    "Police Act 1967": 127,
+    "Road Transport Act 1987": 393,
+    "Sale of Goods Act 1957": 69
+  },
+  "counts_by_processed_file": {
+    "20231101-income-tax-act-1967-act-53.jsonl": 1620,
+    "5. Children and Young Persons (Employment) Act 1966_0.jsonl": 60,
+    "Act 599.jsonl": 239,
+    "Act 828. National Land Code. Revised 2020.jsonl": 1377,
+    "Act-139-FACTORIES-AND-MACHINERY-ACT-1967-REVISED-1974.jsonl": 140,
+    "Act-333-English.jsonl": 393,
+    "Act-A1727.jsonl": 15,
+    "Akta Kerja 1955 (Akta 265).jsonl": 233,
+    "Akta_574_(31.5.2023)_BI.jsonl": 1209,
+    "Civil-Law-Act-1956.jsonl": 63,
+    "Contracts-Act-1950.jsonl": 235,
+    "EMPLOYMENT_INSURANCE_SYSTEM_ACT_2017_Act_800.jsonl": 149,
+    "F1515447514_MYS43880 2017.jsonl": 4681,
+    "Federal Constitution (Reprint 2020).jsonl": 603,
+    "holidays_act_1951.jsonl": 20,
+    "industrial-relations-act-1967.jsonl": 234,
+    "Mariage&Divorce.jsonl": 135,
+    "Occupational-Safety-and-Health-Act-1994-Act-514_Reprint-Version-1.6.2024_English.jsonl": 167,
+    "Perlembagaan Persekutuan (Cetakan Semula 2020).jsonl": 585,
+    "personal-data-protection-act-2010.jsonl": 196,
+    "POLICE ACT 1967.jsonl": 127,
+    "PUA 376.jsonl": 12,
+    "SALE_OF_GOODS_ACT_1957___ACT_382.jsonl": 69
+  },
+  "documents_skipped": [
+    {
+      "name": "Federal Constitution (Reprint 2020)_chunks.json",
+      "reason": "non_jsonl_processed_artifact"
+    },
+    {
+      "name": "personal-data-protection-act-2010.smoke.jsonl",
+      "reason": "smoke_artifact_excluded"
+    }
+  ],
+  "combined_vector_records": 12562,
+  "metadata_anomalies": [],
+  "mixed_unit_documents": [
+    {
+      "document": "National Land Code",
+      "unit_type_counts": {
+        "section": 663,
+        "article": 714
+      }
+    },
+    {
+      "document": "Employees Provident Fund Act 1991",
+      "unit_type_counts": {
+        "section": 170,
+        "article": 4511
+      }
+    },
+    {
+      "document": "Federal Constitution",
+      "unit_type_counts": {
+        "article": 603,
+        "perkara": 585
+      }
+    }
+  ]
+}

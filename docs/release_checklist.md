@@ -1,0 +1,46 @@
+# Release Checklist
+
+- [ ] Layer-by-layer readiness audit reviewed
+- [ ] `docs/layer_readiness_report.md` updated
+- [ ] Configuration / Secrets layer reviewed
+- [ ] API / FastAPI layer reviewed
+- [ ] Authentication / RBAC layer reviewed
+- [ ] Retrieval / Reranking layer reviewed
+- [ ] Answer Generation / Abstention layer reviewed
+- [ ] GraphRAG / Agentic layer reviewed
+- [ ] Ollama / LLM transport layer reviewed
+- [ ] PostgreSQL / pgvector layer reviewed
+- [ ] Docker / Deployment layer reviewed
+- [ ] Logging / Observability layer reviewed
+- [ ] Evaluation / Benchmark layer reviewed
+- [ ] Frontend / UX layer reviewed
+- [ ] RAGFlow integration layer reviewed
+- [ ] Tests / CI layer reviewed
+- [ ] GitHub / Documentation layer reviewed
+- [ ] No `.env` file committed
+- [ ] No `.env.*` secrets file committed
+- [ ] No real API keys or tokens committed
+- [ ] Any previously exposed secrets rotated
+- [ ] `config/api_keys.example.json` remains a safe template only
+- [ ] `scripts/check_ollama.py` passes or fallback state is documented
+- [ ] If using Ollama Cloud or a protected proxy, `OLLAMA_API_KEY` is set and rotated if exposed
+- [ ] Ollama readiness status recorded for the configured model
+- [ ] `/health` returns `ok` or a clearly documented degraded reason
+- [ ] `python -m pytest tests/test_api.py --basetemp <temp-dir>` passes
+- [ ] `python -m pytest tests/test_api.py` passes
+- [ ] `python -m pytest tests/test_retrieval.py` passes
+- [ ] `python -m pytest tests/test_graph_retrieval.py` passes
+- [ ] `python -m pytest tests/test_ragflow_tool.py` passes
+- [ ] `cd frontend && npm run build` passes
+- [ ] `.github/workflows/ci.yml` reviewed and matches the supported local test matrix
+- [ ] Docker validation status recorded in `docs/docker_validation.md`
+- [ ] `docker compose config` passes
+- [ ] `docker compose build` passes
+- [ ] Docker Compose files reviewed for environment-variable secrets
+- [ ] PostgreSQL credentials supplied securely outside the repo
+- [ ] No secrets check completed
+- [ ] Evaluation report exists under `data/evaluation/`
+- [ ] README updated with current benchmark-backed claims only
+- [ ] Demo queries tested
+- [ ] `git status` reviewed before release
+- [ ] No `.pytest-tmp` or other temporary artifact deletions are being staged accidentally

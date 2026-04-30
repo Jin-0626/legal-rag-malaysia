@@ -1,0 +1,19 @@
+{
+  "keys": [
+    {
+      "name": "example-admin",
+      "key_hash": "replace-with-a-real-sha256-hash",
+      "role": "admin"
+    },
+    {
+      "name": "example-researcher",
+      "key_hash": "replace-with-a-real-sha256-hash",
+      "role": "researcher"
+    },
+    {
+      "name": "example-viewer",
+      "key_hash": "replace-with-a-real-sha256-hash",
+      "role": "viewer"
+    }
+  ]
+}

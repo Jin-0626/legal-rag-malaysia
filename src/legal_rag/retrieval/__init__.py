@@ -10,7 +10,7 @@ from .evaluation import (
     load_gold_queries,
     write_evaluation_summary,
 )
-from .in_memory import EmbeddingRetriever, RetrievalResult, SimpleRetriever, SimpleVectorIndex
+from .in_memory import EmbeddingRetriever, RetrievalResult, SearchMode, SimpleRetriever, SimpleVectorIndex
 from .vector_store import JsonlVectorStore, StoredVectorRecord, chunk_from_record, load_chunk_records
 
 __all__ = [
@@ -24,6 +24,7 @@ __all__ = [
     "RetrievalEvaluationSummary",
     "SimpleRetriever",
     "SimpleVectorIndex",
+    "SearchMode",
     "StoredVectorRecord",
     "chunk_from_record",
     "evaluate_retrieval",

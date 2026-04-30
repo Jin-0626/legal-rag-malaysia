@@ -1,207 +1,242 @@
-# Legal RAG System - Malaysian Law
+﻿# Production-ready Legal RAG Malaysia
 
-A Retrieval-Augmented Generation (RAG) system designed for Malaysian legal documents with high-fidelity citations and reduced hallucination.
+A production-style Malaysian legal AI system combining hybrid retrieval, reranking, citation-grounded answer generation, GraphRAG-assisted reasoning, and secure FastAPI deployment.
 
-**Stack:** Python, LangChain, ChromaDB, Ollama, BeautifulSoup4, VS Code
+## Why This Project Exists
 
----
+This repository is built around one practical legal AI goal: return the correct Malaysian legal unit with traceable citations, and abstain when the retrieved sources do not support the answer.
 
-## 📋 Project Structure
+## Features
 
-```
-legal-rag/
-├── data/
-│   ├── raw_documents/          # Original PDFs and legal docs
-│   ├── processed/              # Processed & chunked documents
-│   └── embeddings/             # ChromaDB vector store
-├── src/
-│   ├── document_processor.py   # PDF → Markdown extraction & chunking
-│   ├── rag_pipeline.py         # Main RAG retrieval & generation
-│   └── web_scraper.py          # BeautifulSoup4-based web scraper
-├── notebooks/
-│   ├── 01_setup_and_test.ipynb # Setup verification & testing
-│   └── 02_web_scraping_beautifulsoup.ipynb # Web scraping demo
-├── config/
-│   └── settings.py             # Configuration & paths
-├── scripts/
-│   └── setup_ollama.ps1        # Ollama model setup
-├── requirements.txt            # Python dependencies
-├── .env.example                # Environment template
-└── README.md
-```
+- FastAPI backend
+- React chatbot UI
+- hybrid retrieval
+- reranker
+- citation-grounded answers
+- abstention policy
+- evaluation benchmark
+- Docker Compose
+- PostgreSQL / pgvector scaffold
+- RBAC
+- API key security
+- structured logging
+- Ollama local/cloud
+- RAGFlow integration
 
----
+## Architecture
 
-## 🚀 Quick Start
-
-### 1. **Install Dependencies**
-
-```bash
-pip install -r requirements.txt
+```text
+User -> React UI -> FastAPI -> Auth/RBAC -> Retrieval -> Reranker -> Graph Assist -> Answer Generator -> Sources
 ```
 
-### 2. **Set up Ollama**
+## Retrieval Pipeline
 
-Ollama runs a local LLM without needing OpenAI/cloud APIs.
+```text
+Query -> lexical + vector retrieval -> hybrid merge -> legal-aware filtering -> reranker -> citation-grounded answer
+```
 
-#### Install Ollama:
-- **Windows**: Download from [ollama.ai](https://ollama.ai)
-- **macOS/Linux**: `curl https://ollama.ai/install.sh | sh`
+The active retrieval runtime remains the JSONL-backed corpus and vector store. PostgreSQL/pgvector is included as a deployment scaffold, not as the live retrieval backend.
 
-#### Start Ollama:
-```bash
+## Why Hybrid + Rerank
+
+- embedding-only retrieval is too weak for exact legal-unit lookup and cross-document disambiguation
+- lexical retrieval catches section names and act references but misses paraphrase
+- hybrid retrieval improves candidate recall by combining both signals
+- reranking is the critical step that resolves same-document section collisions and drives citation-ready top-1 accuracy
+
+## Demo
+
+Backend:
+
+```powershell
+.\venv_new\Scripts\python.exe -m pip install -r requirements.txt
+.\venv_new\Scripts\python.exe scripts/check_ollama.py
+.\venv_new\Scripts\python.exe scripts/run_api.py
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Generated corpus and vector artifacts can be rebuilt from raw PDFs:
+
+```powershell
+.\venv_new\Scripts\python.exe scripts/rebuild_all.py
+```
+
+## FastAPI Backend
+
+Documented API endpoints:
+
+- `GET /health`
+- `POST /chat`
+- `POST /chat_stream`
+- `GET /admin/security`
+
+Health reports include:
+
+- app status
+- vector/index status
+- Ollama status
+- model availability
+- database enablement/connectivity
+- non-secret error details
+
+## Citation Grounding and Abstention
+
+The system is designed to:
+
+- answer only from retrieved legal sources
+- cite section/article/perkara references
+- distinguish legal information from legal advice
+- abstain when evidence is missing, weak, or ambiguous
+- avoid hallucinating impossible unit lookups like `Section 999`
+
+Structured answer format:
+
+- `Direct Answer`
+- `Legal Basis`
+- `Practical Meaning`
+- `Important Limits`
+- `Sources`
+
+## Evaluation
+
+Backed by `data/evaluation/final_gold_set_v2_report.md`:
+
+- Final Gold Set V2 benchmark
+- `hybrid_rerank` hit@1: `1.000`
+- `hybrid_filtered_rerank` hit@1: `1.000`
+- `hybrid_plus_graph_with_graph_rerank` hit@1: `1.000`
+- wrong-document rate: `0.000`
+- wrong-section rate: `0.000`
+- negative/no-answer accuracy: `1.000`
+
+Metrics should be rerun after corpus or benchmark changes.
+
+Reproduce:
+
+```powershell
+$env:PYTHONPATH='src'
+.\venv_new\Scripts\python.exe scripts/evaluate_final_gold_set_v2.py
+```
+
+## Quickstart Local
+
+Generated artifacts in `data/processed/` and `data/embeddings/` are rebuildable outputs and are not intended to be source-controlled.
+
+Backend:
+
+```powershell
+.\venv_new\Scripts\python.exe -m pip install -r requirements.txt
+.\venv_new\Scripts\python.exe scripts/check_ollama.py
+.\venv_new\Scripts\python.exe scripts/run_api.py
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Ollama:
+
+```powershell
 ollama serve
-```
-
-#### Pull a model (in another terminal):
-```bash
-ollama pull mistral
+ollama pull gpt-oss:120b-cloud
 ollama pull nomic-embed-text
 ```
 
-Verify models:
-```bash
-ollama list
+Data rebuild:
+
+```powershell
+.\venv_new\Scripts\python.exe scripts/rebuild_all.py
 ```
 
-### 3. **Configure Environment**
+## Quickstart Docker
 
-Copy `.env.example` to `.env`:
-```bash
-cp .env.example .env
+```powershell
+docker compose up --build
 ```
 
-Adjust settings if needed:
-```
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=mistral
-```
+Notes:
 
-### 4. **Run Setup Notebook**
+- supply `DATABASE_URL` and `POSTGRES_PASSWORD` securely before using the Compose stack
+- PostgreSQL/pgvector is scaffolded for deployment readiness and health checks, but the live local retrieval path still defaults to the JSONL vector store
 
-Open `notebooks/01_setup_and_test.ipynb` in VS Code and run all cells to verify installation.
+## Example Queries
 
----
+- What does Section 2 of the Employment Act 1955 define?
+- Which section introduces data portability in PDPA Amendment Act 2024?
+- What do I need to check before signing an employment agreement?
+- Apakah kandungan Perkara 8 dalam Perlembagaan Persekutuan?
 
-## 📚 Pipeline Overview
+## Security
 
-### Step 1: **Web Scraping with BeautifulSoup4**
-- Parse HTML from LOM and Kehakiman portals
-- Extract PDF links and metadata from legal documents
-- Download Acts with proper naming and organization
-- Handle requests efficiently with session management
+- local development can run with `LEGAL_RAG_REQUIRE_API_KEY=false`
+- production deployment should use `LEGAL_RAG_REQUIRE_API_KEY=true`
+- API keys are provided via `X-API-Key`
+- only SHA-256 key hashes should be stored
+- no `.env`, secrets, or real tokens should be committed
+- request logging avoids raw API key disclosure
 
-### Step 2: **Document Processing**
-- Extract text from PDFs (PyMuPDF/`fitz`)
-- Detect legal sections (Section 1, 2, etc.) with regex
-- Create overlapping chunks (1000 token size, 100 token overlap)
-- Save metadata: Act number, section name, source
+## Project Structure
 
-### Step 3: **Semantic Chunking**
-- Use LangChain's `RecursiveCharacterTextSplitter`
-- Prioritize section boundaries
-- Preserve legal structure for accurate citations
-
-### Step 4: **Vector Embeddings**
-- Use Ollama's `nomic-embed-text` model
-- Store in ChromaDB for fast retrieval
-- Cosine similarity for section search
-
-### Step 5: **RAG Query**
-- Retrieve top-K relevant sections (default: 5)
-- Generate answer with retrieved context
-- System prompt enforces citation requirements
-
----
-
-## 🤖 Usage Examples
-
-### Web Scraping with BeautifulSoup4
-
-```python
-from src.web_scraper import LawScraper
-
-# Initialize scraper
-scraper = LawScraper(download_dir="data/raw_documents/downloaded")
-
-# Scrape LOM Portal
-documents = scraper.scrape_lom_acts(max_documents=10)
-
-# Download PDFs
-downloaded_files = scraper.download_multiple_pdfs(documents)
-
-print(f"Downloaded {len(downloaded_files)} files")
+```text
+legal-rag-malaysia/
++-- src/legal_rag/
+¦   +-- api/
+¦   +-- chunking/
+¦   +-- embeddings/
+¦   +-- evaluation/
+¦   +-- generation/
+¦   +-- graph/
+¦   +-- ingestion/
+¦   +-- retrieval/
+¦   +-- storage/
+¦   +-- workflows/
++-- scripts/
++-- frontend/
++-- ragflow_tools/
++-- db/init/
++-- config/
++-- data/
+¦   +-- raw_law_pdfs/
+¦   +-- processed/        # generated locally
+¦   +-- embeddings/       # generated locally
+¦   +-- evaluation/
++-- docs/
++-- docker-compose.yml
++-- Dockerfile.backend
++-- README.md
 ```
 
-### RAG Query
+## RAGFlow Integration
 
-```python
-from src.rag_pipeline import LegalRAG
+RAGFlow is used as an orchestration layer only. The backend remains the system of record for retrieval, reranking, graph assist, and grounded answer generation.
 
-# Initialize
-rag = LegalRAG()
-rag.create_collection()
+## Limitations
 
-# Add documents (from JSON chunks)
-with open('data/processed/pdpa_chunks.json') as f:
-    chunks = json.load(f)
-rag.add_documents(chunks)
+- corpus coverage is limited to the currently ingested Malaysian legal documents
+- outputs are legal information, not legal advice
+- GraphRAG-assisted routing is still targeted and experimental rather than a full graph-native retrieval replacement
+- PostgreSQL/pgvector support is scaffolded for deployment readiness and health checks, not yet the default live retriever
+- generated processed/vector artifacts are rebuilt locally rather than committed as durable source assets
 
-# Query
-result = rag.query("What is the definition of personal data under PDPA?")
-print(result['answer'])
-print(result['sources'])
+## Tests
+
+```powershell
+.\venv_new\Scripts\python.exe -m pytest
+cd frontend
+npm run build
 ```
 
----
+## License
 
-## 🛠️ Current Status
-
-- [x] **Web Scraping**: BeautifulSoup4-based scraper for LOM/Kehakiman portals
-- [x] **Document Processing**: PDF extraction and section-aware chunking
-- [x] **RAG Pipeline**: LangChain + ChromaDB integration
-- [ ] **Download & Process**: Batch download and process Acts
-- [ ] **Neo4j Integration**: Graph relationships between Acts
-- [ ] **Advanced Chunking**: ML-based section detection
-- [ ] **Web UI**: Simple Flask interface for queries
-- [ ] **Testing Suite**: Unit tests for all modules
-
----
-
-## 📖 Next Steps
-
-1. **Sample Data Testing**: Use `sample_pdpa_2010.md` to verify the pipeline works
-2. **Web Scraping**: Implement scraper to download Acts from LOM
-3. **Document Testing**: Run full pipeline on real Malaysian legislation
-4. **Graph Setup**: Add Neo4j for tracking legal relationships
-5. **UI Development**: Create a simple interface for queries
-
----
-
-## ⚠️ Important Notes
-
-- **Local LLMs Only** (for now): Using Ollama to avoid API costs and external dependencies
-- **Citation Accuracy**: System prompt enforces mandatory citations to prevent hallucinations
-- **Privacy**: All processing happens locally; no data sent to cloud services
-- **Malaysian Context**: Documents and prompts tailored for Malaysian legal system
-
----
-
-## 🤝 Contributing
-
-1. Create a new branch for your feature
-2. Add unit tests for new modules
-3. Test against sample PDPA document
-4. Submit PR with description
-
----
-
-## 📝 License
-
-This project is for educational and research purposes.
-
----
-
-## 📧 Support
-
-For issues or questions, check the documentation or create an issue in the repository.
+This project is for educational, research, and portfolio purposes.

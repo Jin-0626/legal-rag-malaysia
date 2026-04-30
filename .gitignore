@@ -129,6 +129,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
 .venv
 env/
 venv/
@@ -180,3 +181,46 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Project-local temp and tooling artifacts
+.pytest-tmp/
+.pytest-tmp-local/
+.pytest-tmp-*/
+.tmp/
+.vscode/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+src/**/__pycache__/
+tests/**/__pycache__/
+scripts/**/__pycache__/
+ragflow_tools/**/__pycache__/
+
+# Local caches and model/runtime scratch files
+*.tmp
+*.cache
+*.log
+*.pid
+*.seed
+*.out
+*.err
+*.stackdump
+data/embeddings/*.smoke.vectors.jsonl
+data/processed/*.smoke.jsonl
+data/processed/*
+!data/processed/.gitkeep
+data/embeddings/*
+!data/embeddings/.gitkeep
+data/evaluation/*report*.tmp
+data/evaluation/*diagnosis*.json
+data/evaluation/*diagnosis*.md
+data/evaluation/retrieval_*.json
+data/evaluation/retrieval_*.jsonl
+data/evaluation/hybrid_retrieval_*.json
+data/evaluation/hybrid_retrieval_*.jsonl
+data/evaluation/multi_pdf_chunk_validation.json
+data/evaluation/pdpa_chunk_boundary_validation.json
+data/evaluation/processed_corpus_gap_report.json
+data/evaluation/reindex_readiness_summary.json
+config/__pycache__/
+config/api_keys.json

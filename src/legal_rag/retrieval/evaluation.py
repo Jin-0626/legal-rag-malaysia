@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from legal_rag.embeddings.embedder import OllamaEmbedder
+from legal_rag.retrieval.in_memory import SearchMode
 from legal_rag.retrieval.vector_store import JsonlVectorStore
 
 MISS_CATEGORIES = (
@@ -25,6 +26,7 @@ class GoldQuery:
     expected_act_title: str
     expected_section_id: str
     expected_subsection_id: str | None = None
+    query_type: str = "general"
 
 
 @dataclass(frozen=True)
@@ -48,6 +50,7 @@ class RetrievalEvaluationCase:
     """Detailed evaluation output for one gold query."""
 
     query: str
+    query_type: str
     expected_act_title: str
     expected_section_id: str
     expected_subsection_id: str | None
@@ -61,9 +64,11 @@ class RetrievalEvaluationCase:
 class RetrievalEvaluationSummary:
     """Aggregate retrieval evaluation metrics and detailed cases."""
 
+    mode: str
     total_queries: int
     hit_at_1: float
     hit_at_3: float
+    wrong_section_rate: float
     error_breakdown: dict[str, int]
     cases: list[RetrievalEvaluationCase]
 
@@ -85,6 +90,7 @@ def load_gold_queries(jsonl_path: Path) -> list[GoldQuery]:
                     expected_act_title=payload["expected_act_title"],
                     expected_section_id=str(payload["expected_section_id"]),
                     expected_subsection_id=payload.get("expected_subsection_id"),
+                    query_type=payload.get("query_type", "general"),
                 )
             )
     return queries
@@ -95,6 +101,7 @@ def evaluate_retrieval(
     vector_store: JsonlVectorStore,
     embedder: OllamaEmbedder,
     top_k: int = 3,
+    mode: SearchMode = "hybrid",
 ) -> RetrievalEvaluationSummary:
     """Evaluate retrieval quality against section-level gold targets."""
 
@@ -104,7 +111,7 @@ def evaluate_retrieval(
     error_breakdown = {category: 0 for category in MISS_CATEGORIES}
 
     for gold_query in gold_queries:
-        results = vector_store.search(gold_query.query, embedder, top_k=top_k)
+        results = vector_store.search(gold_query.query, embedder, top_k=top_k, mode=mode)
         matches = [
             _build_match(gold_query=gold_query, result=result, rank=index + 1)
             for index, result in enumerate(results)
@@ -119,6 +126,7 @@ def evaluate_retrieval(
         cases.append(
             RetrievalEvaluationCase(
                 query=gold_query.query,
+                query_type=gold_query.query_type,
                 expected_act_title=gold_query.expected_act_title,
                 expected_section_id=gold_query.expected_section_id,
                 expected_subsection_id=gold_query.expected_subsection_id,
@@ -132,17 +140,22 @@ def evaluate_retrieval(
     total_queries = len(gold_queries)
     if total_queries == 0:
         return RetrievalEvaluationSummary(
+            mode=mode,
             total_queries=0,
             hit_at_1=0.0,
             hit_at_3=0.0,
+            wrong_section_rate=0.0,
             error_breakdown=error_breakdown,
             cases=[],
         )
 
+    wrong_section_count = error_breakdown["wrong_section"]
     return RetrievalEvaluationSummary(
+        mode=mode,
         total_queries=total_queries,
         hit_at_1=hit_at_1_count / total_queries,
         hit_at_3=hit_at_3_count / total_queries,
+        wrong_section_rate=wrong_section_count / total_queries,
         error_breakdown=error_breakdown,
         cases=cases,
     )
@@ -154,9 +167,11 @@ def write_evaluation_summary(summary: RetrievalEvaluationSummary, output_path: P
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
+        "mode": summary.mode,
         "total_queries": summary.total_queries,
         "hit_at_1": summary.hit_at_1,
         "hit_at_3": summary.hit_at_3,
+        "wrong_section_rate": summary.wrong_section_rate,
         "error_breakdown": summary.error_breakdown,
         "cases": [
             {

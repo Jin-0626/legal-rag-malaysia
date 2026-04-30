@@ -13,6 +13,22 @@ class FakeTransport:
         return [self.vectors[text] for text in texts]
 
 
+class FailingThenSanitizingTransport:
+    def __init__(self, failing_text: str, sanitized_text: str, vector: list[float]) -> None:
+        self.failing_text = failing_text
+        self.sanitized_text = sanitized_text
+        self.vector = vector
+        self.calls: list[list[str]] = []
+
+    def embed(self, *, texts: list[str], model: str) -> list[list[float]]:
+        self.calls.append(list(texts))
+        if any(text == self.failing_text for text in texts):
+            raise RuntimeError("transport rejected raw text")
+        if texts == [self.sanitized_text]:
+            return [self.vector]
+        return [self.vector for _ in texts]
+
+
 def test_ollama_embedder_reuses_cached_embeddings_for_same_input() -> None:
     transport = FakeTransport({"same text": [1.0, 2.0, 3.0]})
     embedder = OllamaEmbedder(model="test-model", transport=transport)
@@ -39,6 +55,19 @@ def test_ollama_embedder_returns_consistent_vector_shape() -> None:
     assert len(vectors) == 2
     assert len(vectors[0]) == 3
     assert len(vectors[1]) == 3
+
+
+def test_ollama_embedder_retries_with_sanitized_text_after_transport_failure() -> None:
+    raw_text = "Notice to remedy ЕЕЕЕ breach"
+    sanitized_text = "Notice to remedy breach"
+    transport = FailingThenSanitizingTransport(raw_text, sanitized_text, [0.1, 0.2, 0.3])
+    embedder = OllamaEmbedder(model="test-model", transport=transport)
+
+    vector = embedder.embed([raw_text])
+
+    assert vector == [[0.1, 0.2, 0.3]]
+    assert transport.calls[0] == [raw_text]
+    assert transport.calls[-1] == [sanitized_text]
 
 
 def test_simple_vector_index_ranks_chunks_by_embedding_similarity() -> None:

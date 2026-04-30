@@ -1,0 +1,9 @@
+services:
+  backend:
+    environment:
+      APP_ENV: development
+      LEGAL_RAG_REQUIRE_API_KEY: ${LEGAL_RAG_REQUIRE_API_KEY:-false}
+      LEGAL_RAG_DATABASE_ENABLED: ${LEGAL_RAG_DATABASE_ENABLED:-false}
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
